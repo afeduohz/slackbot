@@ -12,7 +12,6 @@
         <jackson.version>2.11.0</jackson.version>
     </properties>
 
-
     <dependencies>
         <dependency>
             <groupId>org.java-websocket</groupId>
@@ -69,5 +68,13 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub afeduohz Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/afeduohz/slackbot</url>
+        </repository>
+    </distributionManagement>
 
 </project>
