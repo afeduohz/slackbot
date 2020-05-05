@@ -1,0 +1,61 @@
+import com.defa.slack.message.Blocks;
+import com.defa.slack.message.Markdown;
+
+public class MarkdownTest {
+
+    //output directly to `Block Kit Builder`
+    public static void main(String[] args) {
+        System.out.println(
+                Blocks.create()
+                        .divider()
+                        .section(Markdown.create().bold("blod"))
+                        .divider()
+                        .section(Markdown.create().strikethrough("strike"))
+                        .divider()
+                        .section(Markdown.create().italic("italic"))
+                        .divider()
+                        .section(Markdown.create().bold("first line.").newLine().bold("and second line."))
+                        .divider()
+                        .section(Markdown.create()
+                                .quote("quote")
+                                .quote(m->m.strikethrough("this is strike"))
+                                .quote(m->m.plain("Please contact me ").email("foo.kim@emc.com", m1->m1.bold("foo.kim"))))
+                        .divider()
+                        .section(Markdown.create().inline("inline"))
+                        .divider()
+                        .section(Markdown.create()
+                                .multiline("multiline","m2","m3"))
+                        .divider()
+                        .section(Markdown.create()
+                                .bold(m->m.italic("italic bold")
+                                        .strikethrough("strike bold")
+                                        .italic(m1->m1.strikethrough("strike italic bold")))
+                                .strikethrough(m->m.italic("italic strike")))
+                        .divider()
+                        .section(Markdown.create().list("abc").list("def").list("ghi"))
+                        .divider()
+                        .section(Markdown.create()
+                                .link("https://google.com", "Google")
+                                .s()
+                                .link("https://dell.com")
+                                .s()
+                                .link("https://emc.com", m->m.strikethrough("EMC")))
+                        .divider()
+                        .section(Markdown.create()
+                                .email("foo.kim@dell.com", "foo")
+                                .s()
+                                .email("foo.kim@vce.com")
+                                .s()
+                                .email("foo.kim@emc.com", m->m.strikethrough("foo")))
+                        .divider()
+                        .section(Markdown.create().channel().s().channel("G013NGEF76U"))
+                        .divider()
+                        .section(Markdown.create().user("UF3D91KQS"))
+                        .divider()
+                        .section(Markdown.create().group("TD2AEM941"))
+                        .divider()
+                        .section(Markdown.create().here().s().everyone())
+                        .format()
+        );
+    }
+}
