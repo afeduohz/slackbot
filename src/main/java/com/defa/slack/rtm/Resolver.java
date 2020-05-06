@@ -1,4 +1,4 @@
-package com.defa.slack.rtm.event;
+package com.defa.slack.rtm;
 
 import com.defa.slack.api.Methods;
 

@@ -1,5 +1,9 @@
-package com.defa.slack.rtm.event;
+package com.defa.slack.rtm;
 
+import com.defa.slack.rtm.event.Event;
+import com.defa.slack.rtm.event.JsonEvent;
+import com.defa.slack.rtm.event.Parser;
+import com.defa.slack.rtm.event.TypeEvent;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

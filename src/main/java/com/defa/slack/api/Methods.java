@@ -1,6 +1,5 @@
 package com.defa.slack.api;
 
-import com.defa.slack.Slack;
 import com.defa.slack.api.msg.ErrorResponse;
 import com.defa.slack.util.HttpHelper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -12,7 +11,6 @@ import java.util.Map;
 
 public final class Methods {
     private static final String SLACK_API = "https://slack.com/api/";
-    private Slack slack;
     private String token;
 
     private interface Method {
@@ -27,14 +25,9 @@ public final class Methods {
 
     private Methods(){}
 
-    private Methods(Slack slack, String token){
-        this.slack = slack;
+    private Methods(final String token){
         this.token = token;
         this.methods = new HashMap<>();
-    }
-
-    public interface Callback {
-        void call(String response) throws MethodException, IOException;
     }
 
     private String doPostJson(String url, Map<String, Object> data) throws IOException {
@@ -78,6 +71,56 @@ public final class Methods {
         }
     }
 
+    private Map<String, Object> getParameter(Map<String, Object> optional) {
+        Map<String, Object> required = new HashMap<>();
+        if(optional!=null) required.putAll(optional);
+        return required;
+    }
+
+    private static void registerGet(Methods ms, Api api){
+        ms.register(api, (fn, data)->{
+            try {
+                return ms.doGet(SLACK_API + fn, data);
+            }catch (IOException e){
+                e.printStackTrace();
+                return (new ErrorResponse(e.getMessage())).toString();
+            }
+        });
+    }
+
+    private static void registerPostJson(Methods ms, Api api){
+        ms.register(api, (fn, data)->{
+            try {
+                return ms.doPostJson(SLACK_API + fn, data);
+            }catch (IOException e){
+                e.printStackTrace();
+                return (new ErrorResponse(e.getMessage())).toString();
+            }
+        });
+    }
+
+    public interface Callback {
+        void call(String response) throws MethodException, IOException;
+    }
+
+    public static Methods instance(final String token){
+        assert null!=token;
+        Methods ms = new Methods(token);
+
+        registerGet(ms, Api.RTM_CONNECT);
+
+        registerPostJson(ms, Api.CHAT_POST_MESSAGE);
+        registerPostJson(ms, Api.CHAT_POST_EPHEMERAL);
+        registerPostJson(ms, Api.CHAT_UPDATE);
+        registerPostJson(ms, Api.CHAT_DELETE);
+
+        registerPostJson(ms, Api.PINS_ADD);
+        registerPostJson(ms, Api.PINS_REMOVE);
+        registerGet(ms, Api.PINS_LIST);
+
+        return ms;
+    }
+
     /**
      * shortcuts of OpenAPI Methods
      */
@@ -87,6 +130,7 @@ public final class Methods {
         call(Api.RTM_CONNECT, required, cb);
     }
 
+    @TierSpecial
     public void chatPostMessage(String channel, String text, Map<String, Object> optional, Callback cb) {
         Map<String, Object> required = getParameter(optional);
         required.put("channel", channel);
@@ -135,56 +179,5 @@ public final class Methods {
         required.put("channel", channel);
         call(Api.PINS_ADD, required, cb);
     }
-
-    private Map<String, Object> getParameter(Map<String, Object> optional) {
-        Map<String, Object> required = new HashMap<>();
-        if(optional!=null) required.putAll(optional);
-        return required;
-    }
-
-    public static Methods instance(Slack slack, String token){
-        assert null!=slack && null!=token;
-        Methods ms = new Methods(slack, token);
-
-        registerGet(ms, Api.RTM_CONNECT);
-
-        registerPostJson(ms, Api.CHAT_POST_MESSAGE);
-        registerPostJson(ms, Api.CHAT_POST_EPHEMERAL);
-        registerPostJson(ms, Api.CHAT_UPDATE);
-        registerPostJson(ms, Api.CHAT_DELETE);
-
-        registerPostJson(ms, Api.PINS_ADD);
-        registerPostJson(ms, Api.PINS_REMOVE);
-        registerGet(ms, Api.PINS_LIST);
-
-        return ms;
-    }
-
-    public Slack getSlack(){
-        return this.slack;
-    }
-
-    private static void registerGet(Methods ms, Api api){
-        ms.register(api, (fn, data)->{
-            try {
-                return ms.doGet(SLACK_API + fn, data);
-            }catch (IOException e){
-                e.printStackTrace();
-                return (new ErrorResponse(e.getMessage())).toString();
-            }
-        });
-    }
-
-    private static void registerPostJson(Methods ms, Api api){
-        ms.register(api, (fn, data)->{
-            try {
-                return ms.doPostJson(SLACK_API + fn, data);
-            }catch (IOException e){
-                e.printStackTrace();
-                return (new ErrorResponse(e.getMessage())).toString();
-            }
-        });
-    }
-
 
 }

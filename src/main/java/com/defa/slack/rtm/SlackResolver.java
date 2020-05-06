@@ -1,9 +1,14 @@
-package com.defa.slack.rtm.event;
+package com.defa.slack.rtm;
 
 import com.defa.slack.api.Methods;
 import com.defa.slack.job.CronTask;
 import com.defa.slack.job.SlackJob;
 import com.defa.slack.job.Task;
+import com.defa.slack.job.TaskContext;
+import com.defa.slack.rtm.event.Handler;
+import com.defa.slack.rtm.event.Parser;
+import com.defa.slack.rtm.event.RTMEvent;
+import com.defa.slack.rtm.event.TypeEvent;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
@@ -48,13 +53,15 @@ public class SlackResolver<T> implements Resolver, Slack<T> {
         Map<String, Handler<T>> hdl = this.handlers;
         TypeEvent<T> e = this.getParser().parse(message);
         if(e!=null && hdl.containsKey(e.getType())){
-            hdl.get(e.getType()).handle(e.getEvent(), methods);
+            EventContext context = new EventContext(e.getEvent(), methods);
+            hdl.get(e.getType()).handle(context);
         }
     }
 
     @Override
     public void cron(final Methods methods){
         if(this.cronTasks.size()<1) return;
+        TaskContext context = new TaskContext(methods);
         try {
             SchedulerFactory sf = new StdSchedulerFactory();
             Scheduler scheduler = sf.getScheduler();
@@ -66,7 +73,7 @@ public class SlackResolver<T> implements Resolver, Slack<T> {
                 JobDataMap jdm = new JobDataMap();
                 //ugly implement
                 jdm.put(Task.HANDLER_STORE_KEY, handler);
-                jdm.put(Task.HANDLER_STORE_METHODS, methods);
+                jdm.put(Task.HANDLER_STORE_CONTEXT, context);
                 String jobId = "job" + i, groupId = "group" + i, triggerId = "trigger"+ i;
                 JobDetail jb = JobBuilder.newJob(SlackJob.class)
                         .withIdentity(jobId, groupId)

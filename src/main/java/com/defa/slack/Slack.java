@@ -1,7 +1,7 @@
 package com.defa.slack;
 
 import com.defa.slack.api.Methods;
-import com.defa.slack.rtm.event.Resolver;
+import com.defa.slack.rtm.Resolver;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.java_websocket.client.WebSocketClient;
@@ -16,30 +16,30 @@ public final class Slack {
     private final Resolver resolver;
     private final Methods methods;
 
-    public Slack(String token, Resolver resolver){
+    public Slack(String token, Resolver resolver) {
         assert token != null && resolver != null;
-        this.methods = Methods.instance(this, token);
+        this.methods = Methods.instance(token);
         this.resolver = resolver;
     }
 
-    public boolean connected(){
-        return this.client!=null && this.client.isOpen();
+    public boolean connected() {
+        return this.client != null && this.client.isOpen();
     }
 
     public void connect() {
-        if(!this.connected()) {
-            methods.rtmConnect(null, response ->{
+        if (!this.connected()) {
+            methods.rtmConnect(null, response -> {
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode root = objectMapper.readTree(response);
                 JsonNode okay = root.get("ok");
-                if(okay!=null) {
+                if (okay != null) {
                     boolean ok = okay.asBoolean();
-                    if(ok){
+                    if (ok) {
                         JsonNode url = root.get("url");
-                        if(url!=null) {
+                        if (url != null) {
                             boot(url.asText());
                         }
-                    }else{
+                    } else {
                         System.out.println(response);
                     }
                 }
@@ -58,9 +58,10 @@ public final class Slack {
 
     private void boot(String uri) {
         try {
-            client = new WebSocketClient(new URI(uri),new Draft_6455()) {
+            client = new WebSocketClient(new URI(uri), new Draft_6455()) {
                 @Override
                 public void onOpen(ServerHandshake serverHandshake) {
+                    System.out.println("[slack connected]");
                     cron();
                 }
 
@@ -71,7 +72,7 @@ public final class Slack {
 
                 @Override
                 public void onClose(int i, String s, boolean b) {
-                    System.out.println("bye, slack!");
+                    System.out.println("[slack disconnected]");
                 }
 
                 @Override
