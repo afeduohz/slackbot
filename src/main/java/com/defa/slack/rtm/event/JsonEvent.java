@@ -10,7 +10,7 @@ public class JsonEvent implements Event<JsonNode> {
     }
 
     @Override
-    public JsonNode getEvent() {
+    public JsonNode getMessage() {
         return this.root;
     }
 }

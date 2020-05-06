@@ -12,18 +12,18 @@ String DEFAULT_CHANNEL = "yyyy";
 
 new Slack(DEFAULT_TOKEN,
     new SlackResolver<>(new BasicParser())
-        .listen(RTMEvent.HELLO, (event, methods) ->
+        .listen(RTMEvent.HELLO, (context) ->
             System.out.println(">connected to slack.")
         })
-        .listen(RTMEvent.MESSAGE, (event, methods) -> {
+        .listen(RTMEvent.MESSAGE, (context) -> {
             System.out.println(">message.");
-            JsonNode msg = event.getEvent();
+            JsonNode msg = context.event().getMessage();
             print(msg);
         })
-        .listen(RTMEvent.GOODBYE, (event, methods) -> /** blah... blah... */)
-        .schedule("0 */1 * * * ?", (methods) -> {
+        .listen(RTMEvent.GOODBYE, (context) -> /** blah... blah... */)
+        .schedule("0 */1 * * * ?", (context) -> {
             String text = "Schedule Message: " + (new Date());
-            methods.chatPostMessage(DEFAULT_CHANNEL, text, null, null);
+            context.methods().chatPostMessage(DEFAULT_CHANNEL, text, null, null);
         })
 ).connect();
 ```
