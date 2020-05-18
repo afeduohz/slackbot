@@ -1,6 +1,8 @@
 package com.defa.slack.job;
 
-import org.quartz.*;
+import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
 
 public final class SlackJob implements Job{
     @Override

@@ -1,6 +1,7 @@
 package com.defa.slack;
 
 import com.defa.slack.api.Methods;
+import com.defa.slack.rtm.Connector;
 import com.defa.slack.rtm.Resolver;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,7 +12,7 @@ import org.java_websocket.handshake.ServerHandshake;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public final class Slack {
+public final class Slack implements Connector {
     private WebSocketClient client;
     private final Resolver resolver;
     private final Methods methods;
@@ -22,10 +23,12 @@ public final class Slack {
         this.resolver = resolver;
     }
 
+    @Override
     public boolean connected() {
         return this.client != null && this.client.isOpen();
     }
 
+    @Override
     public void connect() {
         if (!this.connected()) {
             methods.rtmConnect(null, response -> {
@@ -49,11 +52,11 @@ public final class Slack {
     }
 
     private void resolve(final String message) {
-        this.resolver.resolve(message, this.methods);
+        this.resolver.resolve(this, this.methods, message);
     }
 
     private void cron() {
-        this.resolver.cron(this.methods);
+        this.resolver.cron(this, this.methods);
     }
 
     private void boot(String uri) {

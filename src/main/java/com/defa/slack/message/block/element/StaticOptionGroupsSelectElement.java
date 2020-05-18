@@ -1,9 +1,9 @@
 package com.defa.slack.message.block.element;
 
-import com.defa.slack.message.composition.PlainTextObject;
 import com.defa.slack.message.composition.ConfirmationDialogObject;
 import com.defa.slack.message.composition.OptionGroupObject;
 import com.defa.slack.message.composition.OptionObject;
+import com.defa.slack.message.composition.PlainTextObject;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -49,19 +49,19 @@ public class SlackResolver<T> implements Resolver, Slack<T> {
     }
 
     @Override
-    public void resolve(final String message, final Methods methods) {
+    public void resolve(final Connector connector, final Methods methods, final String message) {
         Map<String, Handler<T>> hdl = this.handlers;
         TypeEvent<T> e = this.getParser().parse(message);
         if(e!=null && hdl.containsKey(e.getType())){
-            EventContext context = new EventContext(e.getEvent(), methods);
+            EventContext context = new EventContext(connector, e.getEvent(), methods);
             hdl.get(e.getType()).handle(context);
         }
     }
 
     @Override
-    public void cron(final Methods methods){
+    public void cron(final Connector connector, final Methods methods){
         if(this.cronTasks.size()<1) return;
-        TaskContext context = new TaskContext(methods);
+        TaskContext context = new TaskContext(connector, methods);
         try {
             SchedulerFactory sf = new StdSchedulerFactory();
             Scheduler scheduler = sf.getScheduler();
