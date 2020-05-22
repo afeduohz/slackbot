@@ -84,7 +84,10 @@ public class SlackResolver<T> implements Resolver, Slack<T> {
                         .startAt(new Date(System.currentTimeMillis() + 1000L))
                         .withSchedule(CronScheduleBuilder.cronSchedule(cron))
                         .build();
-                scheduler.scheduleJob(jb, tg);
+                if(!scheduler.checkExists(new JobKey(jobId, groupId))
+                        && !scheduler.checkExists(new TriggerKey(triggerId, groupId))) {
+                    scheduler.scheduleJob(jb, tg);
+                }
             }
             scheduler.start();
         } catch (SchedulerException e) {
