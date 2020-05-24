@@ -51,6 +51,13 @@ public final class Slack implements Connector {
 
     }
 
+    @Override
+    public void disconnect() {
+        if(this.connected()){
+            this.client.close();
+        }
+    }
+
     private void resolve(final String message) {
         this.resolver.resolve(this, this.methods, message);
     }
